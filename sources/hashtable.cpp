@@ -6,7 +6,7 @@
 #include "hashtable.h"
 #include "hash.h"
 
-static name_t * newName(const char * name, size_t name_len, void * data, size_t size);
+static name_t * newName(const char * name, size_t name_len, const void * data, size_t size);
 
 static void delName(name_t * name);
 
@@ -43,7 +43,7 @@ void tableDtor(table_t * table)
     table->names = NULL;
 }
 
-void tableInsert(table_t * table, const char * name, void * data, size_t size)
+void tableInsert(table_t * table, const char * name, const void * data, size_t size)
 {
     assert(table);
     assert(name);
@@ -85,7 +85,7 @@ name_t * tableLookup(table_t * table, const char * name)
     return NULL;
 }
 
-static name_t * newName(const char * name, size_t name_len, void * data, size_t size)
+static name_t * newName(const char * name, size_t name_len, const void * data, size_t size)
 {
     assert(name);
 

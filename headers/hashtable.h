@@ -19,7 +19,7 @@ table_t tableCtor(size_t table_size);
 
 void tableDtor(table_t * table);
 
-void tableInsert(table_t * table, const char * name, void * data, size_t size);
+void tableInsert(table_t * table, const char * name, const void * data, size_t size);
 
 name_t * tableLookup(table_t * table, const char * name);
 

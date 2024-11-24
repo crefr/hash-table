@@ -35,4 +35,6 @@ void tableDtor(table_t * table);
 
 void tableInsert(table_t * table, const char * name, name_type_t type, union value_t val);
 
+name_t * tableLookup(table_t * table, const char * name);
+
 #endif

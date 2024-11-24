@@ -7,6 +7,7 @@
 #include "hash.h"
 
 static name_t * newName(const char * name, size_t name_len, name_type_t type, union value_t val);
+
 static void delName(name_t * name);
 
 table_t tableCtor(size_t table_size)
@@ -25,10 +26,9 @@ void tableDtor(table_t * table)
 
     for (size_t index = 0; index < table->table_size; index++){
         if (table->names[index] != NULL){
-            name_t * cur_name;
-            while (cur_name->next != NULL){
+            name_t * cur_name = table->names[index]->next;
+            while (cur_name != NULL){
                 name_t * next_name = cur_name->next;
-                cur_name->next = NULL;
                 delName(cur_name);
 
                 cur_name = next_name;
@@ -64,6 +64,27 @@ void tableInsert(table_t * table, const char * name, name_type_t type, union val
     cur_name->next = newName(name, name_len, type, val);
 }
 
+name_t * tableLookup(table_t * table, const char * name)
+{
+    assert(table);
+    assert(name);
+
+    size_t name_len = strlen(name) + 1;
+    size_t index = MurMur32Hash(name, sizeof(*name) * name_len, 0) % table->table_size;
+
+    if (table->names[index] != NULL){
+        name_t * cur_name = table->names[index];
+        while (cur_name != NULL){
+            if (strcmp(name, cur_name->name) == 0)
+                return cur_name;
+
+            cur_name = cur_name->next;
+        }
+    }
+
+    return NULL;
+}
+
 static name_t * newName(const char * name, size_t name_len, name_type_t type, union value_t val)
 {
     assert(name);
@@ -83,6 +104,8 @@ static name_t * newName(const char * name, size_t name_len, name_type_t type, un
 
 static void delName(name_t * name)
 {
+    assert(name);
+
     free(name->name);
     free(name);
 }

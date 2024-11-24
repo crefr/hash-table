@@ -5,29 +5,28 @@
 
 int main()
 {
-    table_t table = tableCtor(128);
+    table_t table = tableCtor(8);
 
-    union value_t temp = {};
+    int a = 52;
+    tableInsert(&table, "aboba",  &a, sizeof(a));
 
-    temp.int_ = 52;
-    tableInsert(&table, "aboba",  INT, temp);
+    int b = 36;
+    tableInsert(&table, "bebra",  &b, sizeof(b));
 
-    temp.int_ = 36;
-    tableInsert(&table, "bebra",  INT, temp);
+    int c = 14;
+    tableInsert(&table, "amogus", &c, sizeof(c));
 
-    temp.int_ = 14;
-    tableInsert(&table, "amogus", INT, temp);
-
-    name_t * searched = tableLookup(&table, "bebra");
+    name_t * searched = tableLookup(&table, "aboba");
 
     if (searched != NULL){
         printf("found: %s\n", searched->name);
-        printf("value: %d\n", searched->value.int_);
+        printf("value: %d\n", *((int *)searched->data));
     }
     else {
         printf("did not found(\n");
     }
 
     tableDtor(&table);
+
     return 0;
 }

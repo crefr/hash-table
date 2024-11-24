@@ -6,7 +6,7 @@
 #include "hashtable.h"
 #include "hash.h"
 
-static name_t * newName(const char * name, size_t name_len, name_type_t type, union value_t val);
+static name_t * newName(const char * name, size_t name_len, void * data, size_t size);
 
 static void delName(name_t * name);
 
@@ -43,7 +43,7 @@ void tableDtor(table_t * table)
     table->names = NULL;
 }
 
-void tableInsert(table_t * table, const char * name, name_type_t type, union value_t val)
+void tableInsert(table_t * table, const char * name, void * data, size_t size)
 {
     assert(table);
     assert(name);
@@ -53,7 +53,7 @@ void tableInsert(table_t * table, const char * name, name_type_t type, union val
     size_t index = MurMur32Hash(name, sizeof(*name) * name_len, 0) % table->table_size;
 
     if (table->names[index] == NULL){
-        table->names[index] = newName(name, name_len, type, val);
+        table->names[index] = newName(name, name_len, data, size);
         return;
     }
 
@@ -61,7 +61,7 @@ void tableInsert(table_t * table, const char * name, name_type_t type, union val
     while (cur_name->next != NULL)
         cur_name = cur_name->next;
 
-    cur_name->next = newName(name, name_len, type, val);
+    cur_name->next = newName(name, name_len, data, size);
 }
 
 name_t * tableLookup(table_t * table, const char * name)
@@ -85,7 +85,7 @@ name_t * tableLookup(table_t * table, const char * name)
     return NULL;
 }
 
-static name_t * newName(const char * name, size_t name_len, name_type_t type, union value_t val)
+static name_t * newName(const char * name, size_t name_len, void * data, size_t size)
 {
     assert(name);
 
@@ -96,8 +96,10 @@ static name_t * newName(const char * name, size_t name_len, name_type_t type, un
 
     new_name->next = NULL;
 
-    new_name->type  = type;
-    new_name->value = val;
+    new_name->elem_size  = size;
+
+    new_name->data = calloc(1, size);
+    memcpy(new_name->data, data, size);
 
     return new_name;
 }
@@ -105,6 +107,8 @@ static name_t * newName(const char * name, size_t name_len, name_type_t type, un
 static void delName(name_t * name)
 {
     assert(name);
+
+    free(name->data);
 
     free(name->name);
     free(name);

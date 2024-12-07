@@ -91,7 +91,7 @@ static name_t * newName(const char * name, size_t name_len, const void * data, s
 
     name_t * new_name = (name_t *)calloc(1, sizeof(*new_name));
 
-    new_name->name    = (char *)  calloc(name_len, sizeof(*name));
+    new_name->name    = (char *)  calloc(name_len, sizeof(char));
     strcpy(new_name->name, name);
 
     new_name->next = NULL;
